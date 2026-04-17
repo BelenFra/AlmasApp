@@ -92,51 +92,55 @@ Operational control of ingredient usage.
 
 ## 5. Business Rules
 
-### Product Management
+### Gestión de Productos
 
-| Rule | Detail |
+> Campos del formulario: **SKU** · **Nombre** · **Unidad de negocio** · **Precio** · **Unidad de medida** · **Descripción** · **Comentarios**
+
+| Regla | Detalle |
 |---|---|
-| SKU format | System-generated. Bakery: `BKR-XXXX`. Bistro: `BST-XXXX`. Sequential. |
-| SKU immutability | SKU cannot be changed after creation. Not accepted from Excel imports. |
-| Timestamps | `created_at` and `updated_at` auto-populate; never editable by users. |
-| Business unit | Required on every product. Cannot be changed after creation. |
-| Soft delete | Products are never hard-deleted. Deactivated via `is_active = false`. |
+| Formato de SKU | Generado por el sistema. Pastelería: `BKR-XXXX`. Bodegón: `BST-XXXX`. Secuencial. |
+| Inmutabilidad del SKU | El SKU no puede modificarse luego de la creación. No se acepta desde importaciones Excel. |
+| Fechas automáticas | **Fecha de creación** y **Última edición** se generan automáticamente; no son editables por el usuario. |
+| Unidad de negocio | Obligatoria en cada producto. No puede modificarse luego de la creación. |
+| Baja lógica | Los productos nunca se eliminan físicamente. Se desactivan mediante `is_active = false`. |
 
-### Sales Registration
+### Registro de Ventas
 
-| Rule | Detail |
+> Campos del formulario: **Producto** · **Precio unitario** · **Cantidad** · **Método de pago** · **Nombre del cliente** · **Monto abonado** · **Vuelto** · **Fecha** · **Unidad de negocio**
+
+| Regla | Detalle |
 |---|---|
-| Price auto-fill | Selecting a product auto-fills the unit price from the master catalog. |
-| Price override | User may edit price. System then prompts: *"Would you like to update the master price in the database?"* — Yes updates the product; No records the sale at the custom price only. |
-| Payment methods | Cash, Transfer, Debit, Credit. One per sale. |
-| Change | Calculated automatically: `amount_paid − total_amount`. |
-| Client name | Optional. |
-| Date | Defaults to today. Editable (allows backdating for corrections). |
-| Business unit | Inherited from the products in the sale; must all belong to the same unit. |
+| Precio automático | Al seleccionar un producto, el **precio unitario** se completa automáticamente desde el catálogo maestro. |
+| Edición de precio | El usuario puede editar el precio. El sistema muestra el alerta: *"¿Desea actualizar el precio maestro en la base de datos?"* — **Sí** actualiza el producto; **No** registra la venta con el precio personalizado únicamente. |
+| Métodos de pago | Efectivo, Transferencia, Débito, Crédito, QR. Uno por venta. |
+| Vuelto | Se calcula automáticamente: `monto_abonado − total_venta`. |
+| Nombre del cliente | Opcional. |
+| Fecha | Por defecto es el día de hoy. Editable (permite ingresar fechas anteriores para correcciones). |
+| Unidad de negocio | Heredada de los productos de la venta; todos deben pertenecer a la misma unidad. |
 
-### Bulk Import — Products
+### Importación Masiva — Productos
 
-| Scenario | Behavior |
+| Escenario | Comportamiento |
 |---|---|
-| SKU in file matches existing product | Update all fields except SKU, business unit, and created_at |
-| SKU in file does not exist | Ignore the file's SKU; generate a new system SKU |
-| Required field missing | Skip row; include in error report |
+| El SKU del archivo coincide con un producto existente | Actualiza todos los campos excepto SKU, unidad de negocio y fecha de creación. |
+| El SKU del archivo no existe en el sistema | Ignora el SKU del archivo; genera un nuevo SKU del sistema. |
+| Falta un campo obligatorio | Omite la fila; la incluye en el reporte de errores. |
 
-### Bulk Import — Sales
+### Importación Masiva — Ventas
 
-| Step | Behavior |
+| Paso | Comportamiento |
 |---|---|
-| Pre-import | Show column-matching preview modal; user must confirm before processing |
-| On success | "Successfully loaded [X] sales" |
-| On partial failure | "Successfully loaded [X] sales, but [Y] failed due to errors in columns: [Column Names]" |
-| Error output | Downloadable table containing only the failed rows for correction and re-import |
+| Pre-importación | Muestra un modal de previsualización de columnas; el usuario debe confirmar antes de procesar. |
+| Éxito total | *"Se cargaron [X] ventas exitosamente."* |
+| Éxito parcial | *"Se cargaron [X] ventas exitosamente, pero [Y] fallaron por errores en las columnas: [Nombres de Columnas]."* |
+| Salida de errores | Tabla descargable con únicamente las filas con errores para su corrección y re-importación. |
 
-### Stock Deduction (Phase 3)
+### Descuento de Stock (Fase 3)
 
-- Deduction is triggered on sale confirmation, not on item add
-- Deduction quantity = `sale_item.quantity × recipe_item.quantity / recipe.yield_qty`
-- If a product has no recipe, no deduction occurs
-- All deductions are written to `stock_movements` with `reference_id = sale_id`
+- El descuento se activa al confirmar la venta, no al agregar un ítem
+- Cantidad descontada = `cantidad_vendida × cantidad_receta / rendimiento_receta`
+- Si el producto no tiene receta asociada, no se realiza ningún descuento
+- Todos los descuentos quedan registrados en `stock_movements` con `reference_id = sale_id`
 
 ---
 
@@ -229,16 +233,17 @@ Every confirmed sale triggers the following chain:
 
 ---
 
-## 11. Glossary
+## 11. Glosario
 
-| Term | Definition |
-|---|---|
-| **SKU** | Stock Keeping Unit. A unique identifier assigned by the system to each product. |
-| **Business Unit** | One of the two operating units: Bakery (`BAKERY`) or Bistro (`BISTRO`). |
-| **Upsert** | Insert or update. On product import: update if SKU exists, create if new. |
-| **Master price** | The canonical price stored on the product record, used to auto-fill sales. |
-| **Yield qty** | How many sellable units a single recipe batch produces (e.g. a cake recipe yields 1 unit). |
-| **Reorder point** | The `min_stock` threshold at which a low-stock alert is triggered. |
-| **Blind audit** | A stock count process where the user enters physical quantities without seeing the theoretical expected values, to avoid bias. |
-| **Theoretical stock** | The quantity the system calculates based on purchases minus sales deductions minus waste. |
-| **Cash flow** | Total Sales − Total Expenses for a given period and/or business unit. |
+| Término | Etiqueta en pantalla | Definición |
+|---|---|---|
+| **SKU** | SKU | Código único generado por el sistema para identificar cada producto. |
+| **Unidad de negocio** | Unidad de negocio | Una de las dos unidades operativas: Pastelería (`BAKERY`) o Bodegón (`BISTRO`). |
+| **Upsert** | — | Insertar o actualizar. En la importación de productos: actualiza si el SKU existe, crea si es nuevo. |
+| **Precio maestro** | Precio | El precio canónico almacenado en el producto, usado para completar automáticamente las ventas. |
+| **Rendimiento de receta** | Rendimiento | Cantidad de unidades vendibles que produce un lote de receta (ej. una torta = 1 unidad). |
+| **Punto de reorden** | Stock mínimo | El umbral `min_stock` a partir del cual se activa la alerta de stock bajo. |
+| **Auditoría ciega** | Auditoría de inventario | El propietario ingresa conteos físicos sin ver los valores teóricos esperados, para evitar sesgo. |
+| **Stock teórico** | Stock teórico | Cantidad calculada por el sistema en base a compras menos descuentos por ventas menos mermas. |
+| **Flujo de caja** | Flujo de caja | Total Ventas − Total Gastos para un período y/o unidad de negocio determinados. |
+| **Merma** | Merma / Desperdicio | Pérdida de ingredientes por rotura, vencimiento u otros motivos no relacionados con ventas. |

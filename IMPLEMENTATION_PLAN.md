@@ -68,7 +68,7 @@
 -- ═══════════════════════════════════════════════
 CREATE TYPE business_unit    AS ENUM ('BAKERY', 'BISTRO');
 CREATE TYPE unit_of_measure  AS ENUM ('UNIT', 'GRAMS', 'KG');
-CREATE TYPE payment_method   AS ENUM ('CASH', 'TRANSFER', 'DEBIT', 'CREDIT');
+CREATE TYPE payment_method   AS ENUM ('CASH', 'TRANSFER', 'DEBIT', 'CREDIT', 'QR');
 CREATE TYPE expense_category AS ENUM ('RAW_MATERIALS', 'SALARIES', 'SERVICES', 'RENT', 'MAINTENANCE', 'OTHERS');
 CREATE TYPE movement_type    AS ENUM ('SALE_DEDUCTION', 'WASTE', 'PURCHASE', 'AUDIT_ADJUSTMENT');
 

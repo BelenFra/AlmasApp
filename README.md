@@ -27,7 +27,7 @@ A mobile-first web application that gives employees a fast way to log daily sale
 ### Phase 1 — Product Catalog & Sales (MVP)
 - **Product management** with auto-generated SKUs (`BKR-XXXX` / `BST-XXXX`), business unit tagging, and automatic timestamps
 - **Excel bulk import** with upsert logic — updates existing SKUs, assigns new system SKUs to new entries
-- **Sales registration** with product auto-fill, editable price (prompts to update master), payment method, and change calculation
+- **Sales registration** with product auto-fill, editable price (prompts *"¿Desea actualizar el precio maestro?"*), and payment methods: Efectivo, Transferencia, Débito, Crédito, QR
 - **Bulk sales import** with column-matching preview and downloadable error report for failed rows
 
 ### Phase 2 — Cash Flow & Analytics
