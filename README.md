@@ -1,2 +1,2 @@
-# AlmaApp
+# AlmasApp
 App for Bakery Management 
